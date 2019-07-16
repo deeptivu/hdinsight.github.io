@@ -1,35 +1,37 @@
 ---
 title: Azure HDInsight Solutions | Apache Spark | Resource Allocation
-description: Learn how to resolve an IllegalArgumentException when running Apache Spark jobs using Azure Data Factory.
+description: How resource alloation works in HDInsight Spark Solutions
 services: hdinsight
 author: confusionblinds
-ms.author: sunilkc
+ms.author: deeptivu
 ms.service: hdinsight
 ms.custom: troubleshooting
 ms.topic: conceptual
 ms.date: 10/30/2018
 ---
-# Azure HDInsight Solutions | Spark | IllegalArgumentException
+# Azure HDInsight Solutions | Spark | resource allocation
 
 ## Scenario: Spark activity running in Azure Data Factory fails with IllegalArgumentException
 
 ## Issue
 
-You receive the following exception when trying to execute a Spark activity in an Azure Data Factory pipeline:
+Spark job in Azure HDInsight takes a long time to run. Additionally, one of the following errors might also be encoutnered:
 
 ```java
-Exception in thread "main" java.lang.IllegalArgumentException: 
-Wrong FS: wasbs://additional@xxx.blob.core.windows.net/spark-examples_2.11-2.1.0.jar, expected: wasbs://wasbsrepro-2017-11-07t00-59-42-722z@xxx.blob.core.windows.net
+
 ```
 
 ## Cause
 
-A Spark job will fail if the application jar file is not located in the Spark cluster’s default/primary storage.
-
-This is a known issue with the Spark open source framework tracked in this bug: [Spark job fails if fs.defaultFS and application jar are different url](https://issues.apache.org/jira/browse/SPARK-22587)
-
-This issue has been resolved in Spark 2.3.0
+Spark jobs use worker resources and when enough resources are not available, the job will be queued until the needed resources can be made available. In the meanwhile, a timeout could occur as the application waiting for resources and gets timed out.
 
 ## Solution
 
-Make sure the application jar is stored on the default/primary storage for the HDInsight cluster. In case of Azure Data Factory make sure the ADF linked service is pointed to the HDInsight default container rather than a secondary container.
+Three key parameters that are often adjusted to tune Spark configurations to improve application requirements are spark.executor.instances, spark.executor.cores, and spark.executor.memory. 
+
+Depending on your Spark workload, you may determine that a non-default Spark configuration provides more optimized Spark job executions. You should perform benchmark testing with sample workloads to validate any non-default cluster configurations. Some of the common parameters that you may consider adjusting are:
+  --num-executors sets the number of executors.
+  --executor-cores sets the number of cores for each executor. 
+  --executor-memory controls the memory size (heap size) of each executor on Apache Hadoop YARN, and you'll need to leave some memory for execution overhead.
+  
+When configuring a spark application like below, make sure that the parameters value is within the available resources at the time. Otherwise, the job will wait until the resources are available.
