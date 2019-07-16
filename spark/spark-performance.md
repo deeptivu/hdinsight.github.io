@@ -30,8 +30,11 @@ Spark jobs use worker resources and when enough resources are not available, the
 Three key parameters that are often adjusted to tune Spark configurations to improve application requirements are spark.executor.instances, spark.executor.cores, and spark.executor.memory. 
 
 Depending on your Spark workload, you may determine that a non-default Spark configuration provides more optimized Spark job executions. You should perform benchmark testing with sample workloads to validate any non-default cluster configurations. Some of the common parameters that you may consider adjusting are:
-  --num-executors sets the number of executors.
-  --executor-cores sets the number of cores for each executor. 
-  --executor-memory controls the memory size (heap size) of each executor on Apache Hadoop YARN, and you'll need to leave some memory for execution overhead.
+
+  --num-executors sets the number of executors
+  
+  --executor-cores sets the number of cores for each executor
+  
+  --executor-memory controls the memory size (heap size) of each executor on Apache Hadoop YARN, and you'll need to leave some memory for execution overhead
   
 When configuring a spark application like below, make sure that the parameters value is within the available resources at the time. Otherwise, the job will wait until the resources are available.
